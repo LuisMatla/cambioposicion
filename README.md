@@ -206,6 +206,57 @@ El programa configura los siguientes fusibles:
 - **LVP:** Deshabilitado (Low Voltage Programming OFF)
 - **CP:** Deshabilitado (Code Protection OFF)
 
+## 🖥️ Simulación del Circuito
+
+A continuación se muestra el circuito simulado en **Proteus ISIS**:
+
+![Circuito Simulado](images/circuito_simulado.png)
+
+**Descripción del Circuito Simulado:**
+
+El circuito muestra el microcontrolador **PIC16F877A** conectado a:
+
+- **5 Pulsadores (Button 1-5):** Conectados al PORTB (RB0-RB4) con resistencias pull-up de 10kΩ. Cada pulsador tiene una resistencia pull-up conectada a VCC y el otro terminal del pulsador conectado a GND. Cuando un pulsador no está presionado, el pin del PORTB está en estado alto (5V). Al presionar el pulsador, el pin se conecta a GND, resultando en estado bajo (0V).
+
+- **4 LEDs Rosas (D1-D4):** Conectados al PORTC (RC0-RC3) con resistencias limitadoras de 220Ω. Los LEDs están configurados en modo activo bajo (active-low), donde el ánodo está conectado al pin del PORTC y el cátodo está conectado a VCC a través de la resistencia. Los LEDs se encienden cuando el pin del PORTC está en estado bajo (0V).
+
+**Componentes del Circuito:**
+- Microcontrolador PIC16F877A (U1)
+- 5 Pulsadores (Button 1-5)
+- 5 Resistencias pull-up de 10kΩ (R4-R8)
+- 4 LEDs rosas (D1-D4)
+- 4 Resistencias limitadoras de 220Ω (R9-R12)
+- Alimentación VCC (+5V) y GND
+- Pin MCLR conectado a VCC
+
+**Funcionamiento:**
+- El PORTB (bits 0-4) lee el estado de los pulsadores
+- El bit RB3 se usa como selector de modo (5V = sin inversión, 0V = con inversión)
+- El PORTC (bits 0-3) muestra el nibble más significativo del PORTB, con o sin inversión según RB3
+
+## ✅ Sistema Funcionando
+
+A continuación se muestra el circuito físico montado en protoboard y funcionando correctamente:
+
+![Sistema Funcionando](images/sistema_funcionando.png)
+
+**Descripción del Sistema Físico:**
+
+El circuito está montado en una protoboard y muestra:
+
+- **Microcontrolador PIC16F877A:** Montado en el centro de la protoboard con sus 40 pines conectados correctamente.
+
+- **Cristal Oscilador 4MHz:** Conectado a los pines 13 y 14 del PIC, con dos capacitores cerámicos de 22pF conectados a tierra.
+
+- **4 LEDs:** Conectados al PORTC (RC0-RC3) del PIC, cada uno con su resistencia limitadora de 220Ω. Los LEDs se encienden según el resultado de la operación, mostrando el nibble más significativo del PORTB en el nibble menos significativo del PORTC.
+
+- **Pulsadores o DIP Switches:** Conectados al PORTB (RB0-RB4) del PIC, permitiendo configurar el valor de entrada. El bit RB3 se usa como selector de modo.
+
+- **Conexiones de Alimentación:** Cables rojo y negro conectados a los rieles de alimentación de la protoboard (+5V y GND).
+
+**Estado del Sistema:**
+El sistema está funcionando correctamente, leyendo el nibble más significativo del PORTB y mostrándolo en el nibble menos significativo del PORTC, con o sin inversión según el estado del bit RB3.
+
 ## 📊 Tabla de Valores
 
 ### Modo ALTO (RB3 = 5V / 1) - Sin Inversión
