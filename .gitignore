@@ -1,0 +1,50 @@
+# MPLAB X
+*.o
+*.err
+*.lst
+*.d
+*.cof
+*.map
+*.hex
+*.elf
+*.sym
+*.sdb
+*.p1
+*.pre
+*.pjt
+*.deps
+*.lib
+*.a
+*.so
+*.dll
+*.exe
+
+# Build directories
+build/
+dist/
+debug/
+
+# MPLAB X project files
+*.X/
+nbproject/private/
+# But allow .asm files
+!*.X/*.asm
+
+# Proteus
+*.pdsprj.DESKTOP-*
+*.pdsprj.*.workspace
+
+# Backups
+Project Backups/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Allow images
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!images/
+
