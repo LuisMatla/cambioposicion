@@ -2,31 +2,40 @@
 
 ## 📋 Descripción
 
-Este proyecto implementa un sistema de cambio de posición de nibbles utilizando el microcontrolador **PIC16F877A**. El programa lee un valor de 8 bits desde el **PORTB** y realiza un intercambio de nibbles, mostrando el resultado en el **PORTC**. El comportamiento varía según el estado del bit RB3.
+Este proyecto implementa un sistema de cambio de posición utilizando el microcontrolador **PIC16F877A**. El programa lee el nibble más significativo del **PORTB** (bits 4-7) y lo muestra en el nibble menos significativo del **PORTC** (bits 0-3), con o sin inversión según el estado del bit RB3.
 
 ### 🎯 Funcionalidad
 
 - **PORTB** (bits 0-2, 4-7): Configurado como entrada para leer un valor de 8 bits
-- **PORTB** (bit 3): Configurado como salida y se usa como selector de modo
-- **PORTC** (bits 0-7): Configurado como salida para mostrar el resultado
-- **Operación:** Intercambia los nibbles (bits 0-3 ↔ bits 4-7) con o sin inversión según el modo
+- **PORTB** (bit 3 - RB3): Se usa como selector de modo (5V = sin inversión, 0V = con inversión)
+- **PORTC** (bits 0-3): Configurado como salida para mostrar el nibble más significativo del PORTB
+- **Operación:** Toma el nibble alto del PORTB (bits 4-7) y lo muestra en el nibble bajo del PORTC (bits 0-3)
 
 ### 🔄 Funcionamiento
 
 El programa implementa dos modos de operación según el estado del bit RB3:
 
-**Modo BAJO (RB3 = 0):**
-- Intercambia los nibbles del PORTB
-- Invierte los 4 bits menos significativos mediante XOR con `00001111`
-- Muestra el resultado en PORTC
+**Modo ALTO (RB3 = 5V / 1):**
+- Toma el nibble más significativo del PORTB (bits 4-7)
+- Lo muestra directamente en el nibble menos significativo del PORTC (bits 0-3)
+- Sin inversión
 
-**Modo ALTO (RB3 = 1):**
-- Intercambia los nibbles del PORTB
-- Muestra el resultado directamente en PORTC (sin inversión)
+**Modo BAJO (RB3 = 0V / 0):**
+- Toma el nibble más significativo del PORTB (bits 4-7)
+- Lo invierte mediante XOR con `00001111`
+- Lo muestra en el nibble menos significativo del PORTC (bits 0-3)
 
 **Ejemplo:**
-- Si `PORTB = 11010010` y `RB3 = 0` → `PORTC = 00101101` (intercambio + inversión del nibble bajo)
-- Si `PORTB = 11010010` y `RB3 = 1` → `PORTC = 00101101` (solo intercambio)
+- Si `PORTB = 11010010` (nibble alto = 1101) y `RB3 = 5V` → `PORTC = XXXX1101` (muestra 1101)
+- Si `PORTB = 11010010` (nibble alto = 1101) y `RB3 = 0V` → `PORTC = XXXX0010` (muestra 1101 invertido = 0010)
+
+## 📖 Instrucción de la Práctica
+
+Utilizar el Puerto B como entrada, utilizar el nibble menos significativo del Puerto C como salida. Si en el RB3 se encuentran 5V, mostrar en el nibble menos significativo del Puerto C el valor del nibble más significativo del puerto B. Si en el RB3 se encuentran 0V mostrar en el nibble menos significativo del Puerto C el valor del nibble más significativo del puerto B de manera invertida.
+
+**Ejemplo:**
+- Si `PORTB = 11010010` (nibble alto = 1101) y `RB3 = 5V` → `PORTC = XXXX1101` (muestra 1101 en bits 0-3)
+- Si `PORTB = 11010010` (nibble alto = 1101) y `RB3 = 0V` → `PORTC = XXXX0010` (muestra 1101 invertido = 0010 en bits 0-3)
 
 ## 🔧 Tecnologías Utilizadas
 
@@ -93,18 +102,17 @@ El código está escrito en **ensamblador PIC** y está completamente comentado 
 
 El programa implementa el cambio de posición de la siguiente manera:
 
-**Modo BAJO (RB3 = 0):**
+**Modo ALTO (RB3 = 5V / 1):**
 ```assembly
-valor = PORTB
-resultado = SWAP(valor) XOR 00001111
-PORTC = resultado
+nibble_alto = PORTB[7:4]  // Bits 4-7 del PORTB
+PORTC[3:0] = nibble_alto  // Muestra en bits 0-3 del PORTC
 ```
 
-**Modo ALTO (RB3 = 1):**
+**Modo BAJO (RB3 = 0V / 0):**
 ```assembly
-valor = PORTB
-resultado = SWAP(valor)
-PORTC = resultado
+nibble_alto = PORTB[7:4]  // Bits 4-7 del PORTB
+nibble_invertido = nibble_alto XOR 00001111
+PORTC[3:0] = nibble_invertido  // Muestra invertido en bits 0-3 del PORTC
 ```
 
 ## 🚀 Instalación y Uso
@@ -160,17 +168,17 @@ PORTB.7 → DIP Switch bit 7 o Interruptor 7 (entrada)
 
 ### Conexiones PORTC (Salidas)
 
-El PORTC muestra el resultado de la operación (8 bits):
+El PORTC muestra el resultado en el nibble menos significativo (bits 0-3):
 
 ```
-PORTC.0 → LED 0 (con resistencia 220Ω) → GND
+PORTC.0 → LED 0 (con resistencia 220Ω) → GND (bit menos significativo)
 PORTC.1 → LED 1 (con resistencia 220Ω) → GND
 PORTC.2 → LED 2 (con resistencia 220Ω) → GND
-PORTC.3 → LED 3 (con resistencia 220Ω) → GND
-PORTC.4 → LED 4 (con resistencia 220Ω) → GND
-PORTC.5 → LED 5 (con resistencia 220Ω) → GND
-PORTC.6 → LED 6 (con resistencia 220Ω) → GND
-PORTC.7 → LED 7 (con resistencia 220Ω) → GND
+PORTC.3 → LED 3 (con resistencia 220Ω) → GND (bit más significativo del nibble)
+PORTC.4 → No utilizado
+PORTC.5 → No utilizado
+PORTC.6 → No utilizado
+PORTC.7 → No utilizado
 ```
 
 ### Alimentación
@@ -200,21 +208,25 @@ El programa configura los siguientes fusibles:
 
 ## 📊 Tabla de Valores
 
-### Modo BAJO (RB3 = 0) - Con Inversión
+### Modo ALTO (RB3 = 5V / 1) - Sin Inversión
 
-| Entrada (PORTB) | Nibble Alto | Nibble Bajo | Intercambio | XOR 00001111 | Salida (PORTC) |
-|----------------|-------------|-------------|-------------|--------------|----------------|
-| 11010010       | 1101        | 0010        | 00101101    | 00100010     | 00100010       |
-| 10101010       | 1010        | 1010        | 10101010    | 10100101     | 10100101       |
-| 11110000       | 1111        | 0000        | 00001111    | 00001111     | 00001111       |
+| Entrada PORTB | Nibble Alto (bits 4-7) | Salida PORTC (bits 0-3) | Decimal |
+|---------------|------------------------|--------------------------|---------|
+| 1101XXXX      | 1101                   | 1101                     | 13      |
+| 1010XXXX      | 1010                   | 1010                     | 10      |
+| 1111XXXX      | 1111                   | 1111                     | 15      |
+| 0000XXXX      | 0000                   | 0000                     | 0       |
+| 0101XXXX      | 0101                   | 0101                     | 5       |
 
-### Modo ALTO (RB3 = 1) - Sin Inversión
+### Modo BAJO (RB3 = 0V / 0) - Con Inversión
 
-| Entrada (PORTB) | Nibble Alto | Nibble Bajo | Intercambio | Salida (PORTC) |
-|----------------|-------------|-------------|-------------|----------------|
-| 11010010       | 1101        | 0010        | 00101101    | 00101101       |
-| 10101010       | 1010        | 1010        | 10101010    | 10101010       |
-| 11110000       | 1111        | 0000        | 00001111    | 00001111       |
+| Entrada PORTB | Nibble Alto (bits 4-7) | Invertido (XOR 1111) | Salida PORTC (bits 0-3) | Decimal |
+|---------------|------------------------|----------------------|--------------------------|---------|
+| 1101XXXX      | 1101                   | 0010                 | 0010                     | 2       |
+| 1010XXXX      | 1010                   | 0101                 | 0101                     | 5       |
+| 1111XXXX      | 1111                   | 0000                 | 0000                     | 0       |
+| 0000XXXX      | 0000                   | 1111                 | 1111                     | 15      |
+| 0101XXXX      | 0101                   | 1010                 | 1010                     | 10      |
 
 ## 🧪 Pruebas
 
@@ -228,14 +240,14 @@ El programa configura los siguientes fusibles:
 
 ### Ejemplo de Prueba
 
-- **Entrada:** PORTB = `11010010` (210 decimal)
-- **Modo BAJO (RB3 = 0):**
-  - Intercambio: `00101101`
-  - XOR con `00001111`: `00100010` (34 decimal)
-  - **Salida esperada:** PORTC = `00100010`
-- **Modo ALTO (RB3 = 1):**
-  - Intercambio: `00101101` (45 decimal)
-  - **Salida esperada:** PORTC = `00101101`
+- **Entrada:** PORTB = `11010010` (nibble alto = `1101`)
+- **Modo ALTO (RB3 = 5V / 1):**
+  - Nibble alto del PORTB: `1101`
+  - **Salida esperada:** PORTC = `XXXX1101` (bits 0-3 = 1101, decimal 13)
+- **Modo BAJO (RB3 = 0V / 0):**
+  - Nibble alto del PORTB: `1101`
+  - Invertido (XOR 1111): `0010`
+  - **Salida esperada:** PORTC = `XXXX0010` (bits 0-3 = 0010, decimal 2)
 
 ## 📝 Notas Técnicas
 
